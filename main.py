@@ -33,7 +33,8 @@ def loadFiles():
     for line in lines:
       if(len(line) == 0 or len(line[0]) == ''):
         continue
-      line =  line[:2]+line[start:end]
+      line = line[:2] + line[start:end]
+      line = [float(x) if(x != '()' and ':' not in x) else None for x in line]
       res.setdefault((prop, mms), []).append(line)
 
   return res
@@ -41,43 +42,57 @@ def loadFiles():
 
 def addAvgs(dataSht):
   lenline = 0
+  startLine = 4
   for i, line in enumerate(dataSht):
-    line.append(None)
+    line.insert(0,None)
     lenline = len(line)
     endAlph = xlsxwriter.utility.xl_col_to_name(lenline-2)
-
+    rowi = startLine + i
     stats = [
-      '=AVERAGE(C{}:{}{})'.format(i + 1, endAlph, i + 1),
-      '=MIN(C{}:{}{})'.format(i + 1, endAlph, i + 1),
-      '=MAX(C{}:{}{})'.format(i + 1, endAlph, i + 1),
+      '=AVERAGE(I{}:{}{})'.format(rowi, endAlph, rowi),
+      '=MIN(I{}:{}{})'.format(rowi, endAlph, rowi),
+      '=MAX(I{}:{}{})'.format(rowi, endAlph, rowi),
       None,
       '{}'.format(i)
     ]
     # print(len(line))
-    line = stats + line
+    dataSht[i] = stats + line
     # print(len(line))
   lastLineI = len(dataSht)+2
-  lastLineAvgs = [None,None,None]
-  startLine = 4
 
-  for i in range(len(lastLineAvgs), lenline):
+  padding = [None] * 8
+  lastLineAvgs = list(padding) + ['AVERAGE']
+  for i in range(len(lastLineAvgs), len(lastLineAvgs)+lenline):
     endAlph = xlsxwriter.utility.xl_col_to_name(i)
     lastLineAvgs.append('=AVERAGE({}{}:{}{})'.format(endAlph, startLine, endAlph, lastLineI))
   dataSht.insert(0, lastLineAvgs)
 
-  lastLineAvgs = [None,None,None]
+  lastLineAvgs = list(padding) + ['MAX']
   for i in range(len(lastLineAvgs), lenline):
     endAlph = xlsxwriter.utility.xl_col_to_name(i)
     lastLineAvgs.append('=MAX({}{}:{}{})'.format(endAlph, startLine, endAlph, lastLineI))
   dataSht.insert(0, lastLineAvgs)
 
-  lastLineAvgs = [None, None, None]
+  lastLineAvgs = list(padding) + ['MIN']
   for i in range(len(lastLineAvgs), lenline):
     endAlph = xlsxwriter.utility.xl_col_to_name(i)
     lastLineAvgs.append('=MIN({}{}:{}{})'.format(endAlph, startLine, endAlph, lastLineI))
   dataSht.insert(0, lastLineAvgs)
 
   return dataSht
+
+def addConditionalFormatting(worksheet, dataSht):
+  rows = len(dataSht)
+  cols = len(dataSht[rows / 2])
+  colName = xlsxwriter.utility.xl_col_to_name(cols)
+  end = '{}{}'.format(colName, rows)
+  # main raw data
+  worksheet.conditional_format('I5:{}'.format(end), {'type': '3_color_scale'})
+  # top stats
+  worksheet.conditional_format('I1:{}3'.format(colName), {'type': '3_color_scale'})
+  # left stats
+  worksheet.conditional_format('A4:C{}'.format(rows), {
+                               'type': '3_color_scale'})
 
 def findBorders(lines):
   half = len(lines) / 2
@@ -112,7 +127,7 @@ def createExcel(data):
       # worksheet.write(row, col,     item)
       # worksheet.write(row, col + 1, cost)
       row += 1
-
+    addConditionalFormatting(worksheet, data[key])
     # worksheet.write(row, 0, 'Total')
     # worksheet.write(row, 1, '=SUM(B1:B4)')
   print('saving...')
