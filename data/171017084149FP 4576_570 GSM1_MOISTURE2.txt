@@ -1,0 +1,5 @@
+Roll Number; 1
+Recipe Name; FP 4576_570 GSM
+Start Time; 2017-10-17; 08:41:49
+File Name; D:\Mahlo\TR\171017084149FP 4576_570 GSM1_XMF2.txt
+

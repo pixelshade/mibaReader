@@ -1,0 +1,5 @@
+Roll Number; 0
+Recipe Name; FP 4598_280 GSM
+Start Time; 2018-01-16; 09:56:31
+File Name; D:\Mahlo\TR\180116095631FP 4598_280 GSM0_FMI2.txt
+

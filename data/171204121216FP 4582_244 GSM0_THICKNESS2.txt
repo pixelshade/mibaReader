@@ -1,0 +1,5 @@
+Roll Number; 0
+Recipe Name; FP 4582_244 GSM
+Start Time; 2017-12-04; 12:12:16
+File Name; D:\Mahlo\TR\171204121216FP 4582_244 GSM0_THICKNESS2.txt
+

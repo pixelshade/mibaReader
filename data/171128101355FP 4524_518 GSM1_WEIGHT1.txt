@@ -1,0 +1,5 @@
+Roll Number; 1
+Recipe Name; FP 4524_518 GSM
+Start Time; 2017-11-28; 10:13:55
+File Name; D:\Mahlo\TR\171128101355FP 4524_518 GSM1_FMI1.txt
+

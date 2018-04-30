@@ -7,7 +7,8 @@ import progressbar
 PATH = r'./data/'
 
 def main():
-  data = loadFiles()
+  allLinesDict = loadFiles()
+  data = cropParseDict(allLinesDict)
   createExcel(data)
 
 def loadFiles():
@@ -17,35 +18,51 @@ def loadFiles():
   for fname in bar(glob.glob('{}*.txt'.format(PATH))):
     prop = fname.replace('.txt', '').split('_')[-1]
     mms = fname.replace('.txt', '').split('_')[1].split('-')[0]
-    print(mms, 'mms')
+    # print(mms, 'mms')
 
     lines = []
     with open(fname, 'rb') as f:
       reader = csv.reader(f, delimiter=';', skipinitialspace=True)
-      for i, line in enumerate(reader):
-        if i < 4:
-          continue
-        lines.append(line)
+      try:
+        for i, line in enumerate(reader):
+          if i < 4:
+            continue
+          lines.append(line)
+          res.setdefault((prop, mms), []).append(line)
+      except Exception as e:
+        print(fname, e.message)
+  return res
 
-    # print(len(line))
+
+def cropParseDict(allLinesDict):
+  print('detecting borders')
+  bar = progressbar.ProgressBar()
+  res = {}
+  for key in bar(allLinesDict):
+    prop, mms = key
+    lines = allLinesDict[key]
     start, end = findBorders(lines)
-    # print('borders:',start, end)
     for line in lines:
       if(len(line) == 0 or len(line[0]) == ''):
         continue
       line = line[:2] + line[start:end]
 
-      for i,x in enumerate(line):
-        if(x == '()'):
-          line[i] = None
-        elif ':' in x:
-          line[i] = x
-        else:
-          line[i] = float(x)
+      for i, x in enumerate(line):
+        try:
+          if(x == '()'):
+            line[i] = None
+          elif ':' in x:
+            line[i] = x
+          elif x is None:
+            line[i] = x
+          elif '.' is x:
+            line[i] = float(x)
+          else:
+            line[i] = x
+        except Exception as e:
+          print(key,e,i, line)
       res.setdefault((prop, mms), []).append(line)
-
   return res
-
 
 def addAvgs(dataSht):
   lenline = 0

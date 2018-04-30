@@ -1,0 +1,5 @@
+Roll Number; 0
+Recipe Name; WHF_400
+Start Time; 2018-02-28; 08:03:00
+File Name; D:\Mahlo\TR\180228080300WHF_4000_THICKNESS2.txt
+
