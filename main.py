@@ -4,8 +4,8 @@ import xlsxwriter
 import progressbar
 
 
-PATH = r'./data/'
-
+PATH = r'./data2/'
+OUTPATH = r'./out/'
 def main():
   allLinesDict = loadFiles()
   data = cropParseDict(allLinesDict)
@@ -41,9 +41,11 @@ def cropParseDict(allLinesDict):
   for key in bar(allLinesDict):
     prop, mms = key
     lines = allLinesDict[key]
-    start, end = findBorders(lines)
+    # start, end = findBorders(lines)
+    start = 21
+    end = 121
     for line in lines:
-      if(len(line) == 0 or len(line[0]) == ''):
+      if(line == '' or len(line) == 0 or len(line[0]) == 0):
         continue
       line = line[:2] + line[start:end]
 
@@ -143,15 +145,14 @@ def findBorders(lines):
 
 def createExcel(data):
   print('creating excel')
-  workbook = xlsxwriter.Workbook('data_eval.xlsx')
-  for key in data:
-    bar = progressbar.ProgressBar()
-
+  bar = progressbar.ProgressBar()
+  for key in bar(data):
     row = 0
     col = 0
-    worksheet = workbook.add_worksheet('{}_{}'.format(key[0], key[1]))
+    workbook = xlsxwriter.Workbook('{}{}_{}.xlsx'.format(OUTPATH, key[0], key[1]))
+    worksheet = workbook.add_worksheet('data')
     data[key] = addAvgs(data[key])
-    for line in bar(data[key]):
+    for line in data[key]:
       worksheet.write_row(row, 0, line)
       # worksheet.write(row, col,     item)
       # worksheet.write(row, col + 1, cost)
