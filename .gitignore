@@ -1,2 +1,7 @@
 out/
-
+data/
+data2/
+dataall/
+build/
+dist/
+main.spec
