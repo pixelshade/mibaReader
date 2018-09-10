@@ -1,10 +1,11 @@
+import os
 import csv
 import glob
 import xlsxwriter
 import progressbar
 
 
-PATH = r'./data2/'
+PATH = r'./data/'
 OUTPATH = r'./out/'
 def main():
   allLinesDict = loadFiles()
@@ -57,7 +58,7 @@ def cropParseDict(allLinesDict):
             line[i] = x
           elif x is None:
             line[i] = x
-          elif '.' is x:
+          elif '.' in x:
             line[i] = float(x)
           else:
             line[i] = x
@@ -75,7 +76,7 @@ def addAvgs(dataSht):
     lenline = len(line)
     maxlenline = max(maxlenline, lenline)
     endAlph = xlsxwriter.utility.xl_col_to_name(lenline-2)
-    rowi = startLine + i
+    rowi = startLine + i + 5 #len(stats)
     stats = [
       '=AVERAGE(I{}:{}{})'.format(rowi, endAlph, rowi),
       '=MIN(I{}:{}{})'.format(rowi, endAlph, rowi),
@@ -86,7 +87,7 @@ def addAvgs(dataSht):
     # print(len(line))
     dataSht[i] = stats + line
     # print(len(line))
-  firstLineI = len(dataSht)+2
+  firstLineI = len(dataSht)+3
 
   padding = [None] * 7
   firstLineAvgs = ['AVERAGE', 'MIN', 'MAX', None, None, None, None, 'AVERAGE']
@@ -149,18 +150,22 @@ def createExcel(data):
   for key in bar(data):
     row = 0
     col = 0
+    try:
+        os.makedirs(OUTPATH)
+    except:
+        pass
     workbook = xlsxwriter.Workbook('{}{}_{}.xlsx'.format(OUTPATH, key[0], key[1]))
     worksheet = workbook.add_worksheet('data')
     data[key] = addAvgs(data[key])
     for line in data[key]:
       worksheet.write_row(row, 0, line)
-      # worksheet.write(row, col,     item)
-      # worksheet.write(row, col + 1, cost)
       row += 1
     addConditionalFormatting(worksheet, data[key])
     # worksheet.write(row, 0, 'Total')
     # worksheet.write(row, 1, '=SUM(B1:B4)')
   print('saving...')
+  print(os.path.abspath(workbook.filename))
   workbook.close()
+  print('DONE')
 
 main()
